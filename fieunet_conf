@@ -1,0 +1,49 @@
+router id 1.1.1.1;
+
+protocol kernel {
+        export all; # Install learned routes to the FIB
+}
+
+# This empty section is required for BIRD to work
+protocol device {
+}
+
+# Monitor BGP session for failures
+protocol bfd {
+}
+
+# Sample BGP session. Export routes from "mytest" and accept
+# all incoming routes through this session.
+protocol bgp speedyg{
+        local as 65001;
+        neighbor fc42:1::2 as 65002;
+        export where proto = "adv";
+        import all;
+        source address fc00:1::1;
+        bfd on;
+}
+
+protocol bgp neutralnet{
+        local as 65001;
+        neighbor fc42:2::2 as 65003;
+        export where proto = "adv";
+        import all;
+        source address fc00:2::1;
+        bfd on;
+
+}
+
+protocol bgp bulking{
+        local as 65001;
+        neighbor fc42:3::2 as 65004;
+        export where proto = "adv";
+        import all;
+        source address fc00:3::1;
+        bfd on;
+
+}
+
+# Routes that will be exported to given BGP peer
+protocol static adv {
+        route fc00::/48 via "lo";
+}
